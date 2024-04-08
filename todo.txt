@@ -1,3 +1,0 @@
-all tools menu
-pick random from list
-link opener
