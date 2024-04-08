@@ -68,7 +68,7 @@
 
 
 
-    <div class="main-tool">
+    <div class="main-section">
         <div class="container" style="max-width: 650px;">
             <h1> Random number generator </h1>
 
@@ -144,18 +144,20 @@
                 }
 
                 var output_div = document.getElementById('output')
-                output_div.classList = []
+                output_div.classList.remove('d-none')
 
                 var output = document.getElementById('output-numbers')
                 var stats = getElementById('output-stats')
 
                 if (amount.value.length > 5 || min.value.length > 16 || max.value.length > 16) {
                     output.innerHTML = '&#x1F635;'
-                    output_div.classList.add('output-negative')
+                    output_div.classList.remove('positive')
+                    output_div.classList.add('negative')
                     stats.innerHTML = '<b>Oh no! Big numbers!</b>'
                 }
                 else {
-                    output_div.classList.add('output-positive')
+                    output_div.classList.remove('negative')
+                    output_div.classList.add('positive')
 
                     var date = new Date()
                     var date_string = date.getUTCFullYear() + '-' + (date.getUTCMonth()+1).toString().padStart(2, '0') + '-' + date.getUTCDate().toString().padStart(2, '0')
@@ -173,7 +175,7 @@
         </div>
     </div>
 
-    <div id="output" class="d-none">
+    <div id="output" class="output-section d-none">
         <div class="container" style="max-width: 1000px;">
             <div class="row justify-content-between align-self-center">
                 <div id="output-stats" class="col-auto small text-center py-3"></div>
