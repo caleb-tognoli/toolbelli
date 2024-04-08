@@ -61,10 +61,19 @@ h1 {
     color: var(--main-color-dark);
 }
 
-.input-group-append .btn {
-    border-radius: 0px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+
+.second-section {
+    background-color: var(--main-color-light);
+}
+
+.second-section h2 {
+    color: var(--main-color-darker);
+}
+
+.second-section .border {
+    border-color: var(--main-color-darker) !important;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 
@@ -78,6 +87,17 @@ h1 {
 .nav-item {
     margin: 0.5em;
 }
+
+
+
+.input-group-append .btn {
+    border-radius: 0px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+
 
 
 .card-title a {

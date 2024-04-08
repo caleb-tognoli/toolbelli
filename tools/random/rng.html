@@ -23,11 +23,9 @@
 
     <script>
         var display_option_visible = false
+        var history_visible = false
 
         function generate() {
-            var tooltip = bootstrap.Tooltip.getInstance('#copy-to-clipboard');
-            tooltip.setContent({ '.tooltip-inner': 'Copy to clipboard' });
-
             amount = document.getElementById('amount')
             min = document.getElementById('min')
             max = document.getElementById('max')
@@ -54,12 +52,18 @@
                 output_div.classList.remove('negative')
                 output_div.classList.add('positive')
 
+                var string_timestamp = get_string_UTC_timestamp() + ' UTC'
+
                 var plural = (amount.value > 1) ? 's' : ''
-                stats.innerHTML = '<b>'+ get_string_UTC_timestamp() + ' UTC </b>'
+                stats.innerHTML = '<b>'+ string_timestamp + '</b>'
                 stats.innerHTML += 'Generated ' + amount.value + ' number' + plural + ' from ' + min.value + ' to ' + max.value
 
                 var separator = document.getElementById('separator').value + document.querySelector('input[name=\'separatorRadios\']:checked').value
-                output.innerHTML = array_to_string(generate_random_numbers(amount.value, min.value, max.value), separator)
+                var generated_numbers = generate_random_numbers(amount.value, min.value, max.value)
+                output.innerHTML = array_to_string(generated_numbers, separator)
+
+                var history = document.getElementById('history')
+                history.innerHTML = '<b>' + string_timestamp + '</b><br>' + array_to_string(generated_numbers, ', ') + '<br>' + history.innerHTML
             }   
         }
     </script>
@@ -69,7 +73,7 @@
     <header class="sticky-top bg-white navbar navbar-expand-md navbar-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="../../index.html">
-                <img src="../../logo.png" alt="" width="200px" class="user-select-none d-inline-block align-text-top m-2">
+                <img src="../../logo.png" alt="logo" width="200px" class="user-select-none d-inline-block align-text-top m-2">
             </a>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
@@ -121,7 +125,7 @@
                             <div class="input-group">
                                 <input id="separator" class="form-control" type="text" value="," maxlength="10"> 
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary bi bi-arrow-counterclockwise px-3" type="button" 
+                                    <button class="btn btn-primary bi bi-arrow-counterclockwise px-3" type="button" title="Reset"
                                     onclick="document.getElementById('separator').value=','"></button>
                                 </div>
                             </div>
@@ -151,23 +155,71 @@
         </div>
     </div>
 
+    <div class="container-fluid" >
+        <div class="row">
+            <div class="col p-0">
+                <div id="output" class="col p-0 output-section overflow-auto">
+                    <div class="m-auto px-3" style="max-width: 1000px;">
+                        <div class="row justify-content-between align-self-center">
+                            <div id="output-stats" class="col-auto small text-center py-3"></div>
+                            <div class="col-auto">
+                                <button 
+                                    id="copy-to-clipboard"
+                                    title="Copy to clipboard"
+                                    class="align-self-end bi bi-clipboard pb-2 btn" 
+                                    style="font-size: 1.5em;" 
+                                    onclick="
+                                        navigator.clipboard.writeText(document.getElementById('output-numbers').innerHTML)
+                                    ">
+                                </button>
+                                <button 
+                                    id="history-button"
+                                    title="Toggle history"
+                                    class="align-self-end bi bi-clock pb-2 btn" 
+                                    style="font-size: 1.5em;" 
+                                    onclick="
+                                        history_visible = !history_visible
+                                        var history = document.getElementById('history-section')
+                                        
+                                        if(history_visible) {
+                                            history.classList.remove('d-none')
+                                            history.classList.add('d-block')
+                                        } else {
+                                            history.classList.remove('d-block')
+                                            history.classList.add('d-none')
+                                        }
+                                        console.log(history.classList)
+                                    ">
+                                </button>
+                            </div>
+                        </div>
+                        <div id="output-numbers" class="display-5 pb-4" style="overflow: auto"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="history-section" class="col-4 py-4 px-4 d-none second-section" style="">
+                <h2>History</h2>
+                <div class="py-3">
+                    <div id="history" class="border" style="overflow: auto; max-height: 600px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="output" class="output-section d-none">
         <div class="container" style="max-width: 1000px;">
             <div class="row justify-content-between align-self-center">
                 <div id="output-stats" class="col-auto small text-center py-3"></div>
-                <button 
-                    id="copy-to-clipboard"
-                    type="button" 
-                    class="col-auto align-self-end bi bi-clipboard pb-2 btn" 
-                    style="font-size: 1.5em;" 
-                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Copy to clipboard" 
-                    onclick="
-                        navigator.clipboard.writeText(document.getElementById('output-numbers').innerHTML)
-                    
-                        var tooltip = bootstrap.Tooltip.getInstance('#copy-to-clipboard');
-                        tooltip.setContent({ '.tooltip-inner': 'Copied!' });
-                    ">
-                </button>
+                <div class="col-auto">
+                    <button 
+                        id="copy-to-clipboard"
+                        class="align-self-end bi bi-clipboard pb-2 btn" 
+                        style="font-size: 1.5em;" 
+                        onclick="
+                            navigator.clipboard.writeText(document.getElementById('output-numbers').innerHTML)
+                        ">
+                    </button>
+                </div>
             </div>
             
             <div id="output-numbers" class="display-5 pb-4" style="overflow: auto"></div>
@@ -186,13 +238,6 @@
         integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
         crossorigin="anonymous"
     ></script>
-
-    <script>
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    </script>
 
 </body>
 </html>
