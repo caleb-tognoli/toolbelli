@@ -17,6 +17,7 @@
     />
 
     <link rel="stylesheet" href="../../toolbelli.css">
+    <script src="../../toolbelli.js"></script>
 
 <head>
     <title>RNG - toolbelli</title>
@@ -24,30 +25,52 @@
     <script>
         var display_option_visible = false
 
-        function generate_random_numbers(amount, min, max) {
-            const minCeiled = Math.ceil(min);
-            const maxFloored = Math.floor(max);
-            var numbers = []
-            for(i = amount; i > 0; i--) {
-                numbers.push(Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled))
-            }
-            return numbers
-        }
+        function generate() {
+            var tooltip = bootstrap.Tooltip.getInstance('#copy-to-clipboard');
+            tooltip.setContent({ '.tooltip-inner': 'Copy to clipboard' });
 
-        function array_to_string(array, separator) {
-            var out = ""
-            for(i = 0; i < array.length; i++) {
-                out += array[i]
-                if(i != array.length - 1) {
-                    out += separator
-                }
+            amount = document.getElementById('amount')
+            min = document.getElementById('min')
+            max = document.getElementById('max')
+
+            amount.value = Math.max(amount.value, 0)
+            if (Math.ceil(min.value) > Math.ceil(max.value)) {
+                t = min.value
+                min.value = max.value
+                max.value = t
             }
-            return out
+
+            var output_div = document.getElementById('output')
+            output_div.classList.remove('d-none')
+
+            var output = document.getElementById('output-numbers')
+            var stats = document.getElementById('output-stats')
+
+            if (amount.value.length > 5 || min.value.length > 16 || max.value.length > 16) {
+                output.innerHTML = '&#x1F635;'
+                output_div.classList.remove('positive')
+                output_div.classList.add('negative')
+                stats.innerHTML = '<b>Oh no! Big numbers!</b>'
+            }
+            else {
+                output_div.classList.remove('negative')
+                output_div.classList.add('positive')
+
+                var date = new Date()
+                var date_string = date.getUTCFullYear() + '-' + (date.getUTCMonth()+1).toString().padStart(2, '0') + '-' + date.getUTCDate().toString().padStart(2, '0')
+                date_string += ' ' + date.getUTCHours().toString().padStart(2, '0') + ':' + date.getUTCMinutes().toString().padStart(2, '0') + ':' + date.getUTCSeconds().toString().padStart(2, '0') + ' UTC'
+
+                var plural = (amount.value > 1) ? 's' : ''
+                stats.innerHTML = '<b>'+date_string + '</b> Generated ' + amount.value + ' number' + plural + ' from ' + min.value + ' to ' + max.value
+
+                var separator = document.getElementById('separator').value + document.querySelector('input[name=\'separatorRadios\']:checked').value
+                output.innerHTML = array_to_string(generate_random_numbers(amount.value, min.value, max.value), separator)
+            }   
         }
     </script>
 </head>
 
-<body>
+<body onload="generate()">
     <header class="sticky-top bg-white navbar navbar-expand-md navbar-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="../../index.html">
@@ -128,48 +151,7 @@
             </small>
             
             <button class="btn-primary my-3" style="width: 100%;" 
-            onclick="
-                var tooltip = bootstrap.Tooltip.getInstance('#copy-to-clipboard');
-                tooltip.setContent({ '.tooltip-inner': 'Copy to clipboard' });
-
-                amount = document.getElementById('amount')
-                min = document.getElementById('min')
-                max = document.getElementById('max')
-
-                amount.value = Math.max(amount.value, 0)
-                if (Math.ceil(min.value) > Math.ceil(max.value)) {
-                    t = min.value
-                    min.value = max.value
-                    max.value = t
-                }
-
-                var output_div = document.getElementById('output')
-                output_div.classList.remove('d-none')
-
-                var output = document.getElementById('output-numbers')
-                var stats = getElementById('output-stats')
-
-                if (amount.value.length > 5 || min.value.length > 16 || max.value.length > 16) {
-                    output.innerHTML = '&#x1F635;'
-                    output_div.classList.remove('positive')
-                    output_div.classList.add('negative')
-                    stats.innerHTML = '<b>Oh no! Big numbers!</b>'
-                }
-                else {
-                    output_div.classList.remove('negative')
-                    output_div.classList.add('positive')
-
-                    var date = new Date()
-                    var date_string = date.getUTCFullYear() + '-' + (date.getUTCMonth()+1).toString().padStart(2, '0') + '-' + date.getUTCDate().toString().padStart(2, '0')
-                    date_string += ' ' + date.getUTCHours().toString().padStart(2, '0') + ':' + date.getUTCMinutes().toString().padStart(2, '0') + ':' + date.getUTCSeconds().toString().padStart(2, '0') + ' UTC'
-
-                    var plural = (amount.value > 1) ? 's' : ''
-                    stats.innerHTML = '<b>'+date_string + '</b> Generated ' + amount.value + ' number' + plural + ' from ' + min.value + ' to ' + max.value
-
-                    var separator = document.getElementById('separator').value + document.querySelector('input[name=\'separatorRadios\']:checked').value
-                    output.innerHTML = array_to_string(generate_random_numbers(amount.value, min.value, max.value), separator)
-                }   
-            ">
+            onclick="generate()">
             Generate
             </button>
         </div>
