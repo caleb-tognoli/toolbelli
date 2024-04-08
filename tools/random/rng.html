@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-    
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta
@@ -46,22 +45,18 @@
             var output = document.getElementById('output-numbers')
             var stats = document.getElementById('output-stats')
 
-            if (amount.value.length > 5 || min.value.length > 16 || max.value.length > 16) {
+            if (amount.value.length > 5 || min.value.length > 19 || max.value.length > 19) {
                 output.innerHTML = '&#x1F635;'
                 output_div.classList.remove('positive')
                 output_div.classList.add('negative')
                 stats.innerHTML = '<b>Oh no! Big numbers!</b>'
-            }
-            else {
+            } else {
                 output_div.classList.remove('negative')
                 output_div.classList.add('positive')
 
-                var date = new Date()
-                var date_string = date.getUTCFullYear() + '-' + (date.getUTCMonth()+1).toString().padStart(2, '0') + '-' + date.getUTCDate().toString().padStart(2, '0')
-                date_string += ' ' + date.getUTCHours().toString().padStart(2, '0') + ':' + date.getUTCMinutes().toString().padStart(2, '0') + ':' + date.getUTCSeconds().toString().padStart(2, '0') + ' UTC'
-
                 var plural = (amount.value > 1) ? 's' : ''
-                stats.innerHTML = '<b>'+date_string + '</b> Generated ' + amount.value + ' number' + plural + ' from ' + min.value + ' to ' + max.value
+                stats.innerHTML = '<b>'+ get_string_UTC_timestamp() + ' UTC </b>'
+                stats.innerHTML += 'Generated ' + amount.value + ' number' + plural + ' from ' + min.value + ' to ' + max.value
 
                 var separator = document.getElementById('separator').value + document.querySelector('input[name=\'separatorRadios\']:checked').value
                 output.innerHTML = array_to_string(generate_random_numbers(amount.value, min.value, max.value), separator)
@@ -89,8 +84,7 @@
         </div>
     </header>
 
-
-
+    
     <div class="main-section">
         <div class="container" style="max-width: 650px;">
             <h1> Random number generator </h1>
@@ -107,7 +101,7 @@
                 </div>
                 <div class="form-group col">
                     <label for="max"> Max </label>
-                    <input id="max" class="form-control" type="number" value="9"> 
+                    <input id="max" class="form-control" type="number" value="10"> 
                 </div>
             </div>
             

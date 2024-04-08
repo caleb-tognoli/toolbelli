@@ -18,3 +18,25 @@ function array_to_string(array, separator) {
     }
     return out
 }
+
+function get_string_UTC_date() {
+    var date = new Date()
+    var date_string = ''
+    date_string += date.getUTCFullYear() 
+    date_string += '-' + (date.getUTCMonth()+1).toString().padStart(2, '0') 
+    date_string += '-' + date.getUTCDate().toString().padStart(2, '0')
+    return date_string
+}
+
+function get_string_UTC_time() {
+    var date = new Date()
+    var time_string = ''
+    time_string += date.getUTCHours().toString().padStart(2, '0') 
+    time_string += ':' + date.getUTCMinutes().toString().padStart(2, '0')
+    time_string += ':' + date.getUTCSeconds().toString().padStart(2, '0')
+    return time_string
+}
+
+function get_string_UTC_timestamp() {
+    return get_string_UTC_date() + " " + get_string_UTC_time()
+}
