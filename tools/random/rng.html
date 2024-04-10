@@ -30,7 +30,7 @@
             min = document.getElementById('min')
             max = document.getElementById('max')
 
-            amount.value = Math.max(amount.value, 0)
+            amount.value = Math.max(amount.value, amount.min)
             if (Math.ceil(min.value) > Math.ceil(max.value)) {
                 t = min.value
                 min.value = max.value
@@ -56,7 +56,7 @@
 
                 var plural = (amount.value > 1) ? 's' : ''
                 stats.innerHTML = '<b>'+ string_timestamp + '</b>'
-                stats.innerHTML += 'Generated ' + amount.value + ' number' + plural + ' from ' + min.value + ' to ' + max.value
+                stats.innerHTML += ' Generated ' + amount.value + ' number' + plural + ' from ' + min.value + ' to ' + max.value
 
                 var separator = document.getElementById('separator').value + document.querySelector('input[name=\'separatorRadios\']:checked').value
                 var generated_numbers = generate_random_numbers(amount.value, min.value, max.value)
@@ -95,7 +95,7 @@
 
             <div class="form-group">
                 <label for="amount"> Amount </label>
-                <input id="amount" class="form-control" type="number" min="0" value="1"> 
+                <input id="amount" class="form-control" type="number" min="1" value="1"> 
             </div>
 
             <div class="row my-2 gx-4">
@@ -148,10 +148,7 @@
                 </div>
             </small>
             
-            <button class="btn-primary my-3" style="width: 100%;" 
-            onclick="generate()">
-            Generate
-            </button>
+            <button class="btn-primary my-3" style="width: 100%;" onclick="generate()"> Generate </button>
         </div>
     </div>
 
@@ -188,7 +185,6 @@
                                             history.classList.remove('d-block')
                                             history.classList.add('d-none')
                                         }
-                                        console.log(history.classList)
                                     ">
                                 </button>
                             </div>

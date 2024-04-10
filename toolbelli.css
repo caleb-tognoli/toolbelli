@@ -107,3 +107,10 @@ h1 {
 .card-title a:hover {
     color: var(--main-color-darker);
 }
+
+label {
+    margin-bottom: 0.2em;
+}
+label small {
+    font-size: 0.8em;
+}

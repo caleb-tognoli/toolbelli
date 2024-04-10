@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Random picker - toolbelli</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+
+        <!-- Bootstrap CSS v5.2.1 -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        />
+
+        <link rel="stylesheet" href="../../toolbelli.css">
+        <script src="../../toolbelli.js"></script>
+        <script>
+            var display_option_visible = false
+            var history_visible = false
+        </script>
+    </head>
+
+    <body>
+        <header class="sticky-top bg-white navbar navbar-expand-md navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../../index.html">
+                    <img src="../../logo.png" alt="logo" width="200px" class="user-select-none d-inline-block align-text-top m-2">
+                </a>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                        <a class="nav-link" href="../../index.html">All tools</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="../../about.html">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        
+
+        <main>
+            <div class="main-section">
+                <div class="container" style="max-width: 650px;">
+                    <h1>Random picker</h1>
+                    <div class="form-group">
+                        <label for="list"> 
+                            Items 
+                            <small>(each on a separate line)</small>
+                        </label>
+                        <textarea class="form-control" id="list" rows="10"></textarea>
+                    </div>
+                    <div class="form-group my-4">
+                        <label for="amount"> Number of items to pick </label>
+                        <input id="amount" class="form-control" type="number" min="1" value="1"> 
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="remove-after-picked">
+                        <label class="form-check-label" for="remove-after-picked">
+                            Remove picked items from list
+                        </label>
+                    </div>
+                    <div class="small my-3">
+                        <button class="option-button bi-caret-down-fill mb-2" 
+                        onclick="
+                            display_option_visible = !display_option_visible
+                            document.getElementById('advanced-options').style = display_option_visible ? 'display: block-inline' : 'display: none'
+                        "> 
+                            Display options
+                        </button>
+                        
+                        <div id="advanced-options" class="row" style="display: none;">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="separator"> Separator </label>
+                                    <div class="input-group">
+                                        <input id="separator" class="form-control" type="text" value="" maxlength="10"> 
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary bi bi-arrow-counterclockwise px-3" type="button" title="Reset"
+                                            onclick="document.getElementById('separator').value=''"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-check"> 
+                                    <input class="form-check-input" name="separatorRadios" type="radio" value=" " id=""/>
+                                    <label class="form-check-label" for=""> Space </label>
+                                </div>
+                                <div class="form-check"> 
+                                    <input class="form-check-input" name="separatorRadios" type="radio" value="<br>" id="" checked/>
+                                    <label class="form-check-label" for=""> New line </label>
+                                </div>
+                                <div class="form-check"> 
+                                    <input class="form-check-input" name="separatorRadios" type="radio" value="" id="" />
+                                    <label class="form-check-label" for=""> None </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width: 100%;" onclick="
+                        var amount = document.getElementById('amount')
+                        amount.value = Math.max(amount.min, amount.value)
+
+                        var items = document.getElementById('list').value.split('\n')
+                        for(i = 0; i<items.length; i++)
+                            if(items[i].trim().length == 0)
+                                items.splice(i, 1)
+
+                        var output = document.getElementById('output')
+                        var output_stats = document.getElementById('output-stats')
+                        var output_text = document.getElementById('output-text')
+
+                        if(items.length < amount.value) {
+                            output.classList.remove('d-none')
+                            output.classList.remove('positive')
+                            output.classList.add('negative')
+                            output_stats.innerHTML = '<b>Not enough itmes in the list to pick ' + amount.value +'</b>'
+                            output_text.innerHTML = '😵'
+                        } else {
+                            output.classList.remove('d-none')
+                            output.classList.remove('negative')
+                            output.classList.add('positive')
+
+                            var rand_indexes = []
+                            while(rand_indexes.length < amount.value) {
+                                var new_rand = generate_random_numbers(1, 0, items.length-1)[0]
+                                if(!rand_indexes.includes(new_rand)) 
+                                    rand_indexes.push(new_rand)
+                            }
+
+                            var string_timestamp = get_string_UTC_timestamp() + ' UTC'
+                            
+                            var remove_picked_from_list = document.getElementById('remove-after-picked').checked
+
+                            var picked_items = []
+                            rand_indexes.forEach((index) => {
+                                picked_items.push(items[index])
+                            });
+                            if(remove_picked_from_list) {
+                                picked_items.forEach((picked_item) => {
+                                    items.splice(items.indexOf(picked_item), 1)
+                                });
+                            }
+                            
+                            document.getElementById('list').value = array_to_string(items, '\n')
+
+                            output_stats.innerHTML = '<b>' + string_timestamp + '</b>'
+                            output_stats.innerHTML += ' Picked '
+                            if(remove_picked_from_list)
+                                output_stats.innerHTML += 'and removed '
+                            output_stats.innerHTML += amount.value + ' item'
+                            if(amount.value > 1)
+                                output_stats.innerHTML += 's'
+                            output_stats.innerHTML += ' from the list'
+                            
+                            var separator = document.getElementById('separator').value + document.querySelector('input[name=\'separatorRadios\']:checked').value
+                            output_text.innerHTML = array_to_string(picked_items, separator)
+
+                            var history = document.getElementById('history')
+                            history.innerHTML = '<b>' + string_timestamp + '</b><br>' + array_to_string(picked_items, ', ') + '<br>' + history.innerHTML
+                        }
+                    "> Pick </button>
+                </div>
+            </div>
+
+            <div class="container-fluid" >
+                <div class="row">
+                    <div class="col p-0">
+                        <div id="output" class="col p-0 output-section overflow-auto d-none positive">
+                            <div class="m-auto px-3" style="max-width: 1000px;">
+                                <div class="row justify-content-between align-self-center">
+                                    <div id="output-stats" class="col-auto small text-center py-3"></div>
+                                    <div class="col-auto">
+                                        <button 
+                                            id="copy-to-clipboard"
+                                            title="Copy to clipboard"
+                                            class="align-self-end bi bi-clipboard pb-2 btn" 
+                                            style="font-size: 1.5em;" 
+                                            onclick="
+                                                navigator.clipboard.writeText(document.getElementById('output-text').innerHTML)
+                                            ">
+                                        </button>
+                                        <button 
+                                            id="history-button"
+                                            title="Toggle history"
+                                            class="align-self-end bi bi-clock pb-2 btn" 
+                                            style="font-size: 1.5em;" 
+                                            onclick="
+                                                history_visible = !history_visible
+                                                var history = document.getElementById('history-section')
+                                                
+                                                if(history_visible) {
+                                                    history.classList.remove('d-none')
+                                                    history.classList.add('d-block')
+                                                } else {
+                                                    history.classList.remove('d-block')
+                                                    history.classList.add('d-none')
+                                                }
+                                            ">
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="output-text" class="display-5 pb-4" style="overflow: auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="history-section" class="col-4 py-4 px-4 d-none second-section">
+                        <h2>History</h2>
+                        <div class="py-3">
+                            <div id="history" class="border" style="overflow: auto; max-height: 600px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+        <footer>
+            <!-- place footer here -->
+        </footer>
+        <!-- Bootstrap JavaScript Libraries -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"
+        ></script>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>
