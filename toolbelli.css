@@ -5,6 +5,13 @@
     --main-color-light: #907ad6;
     --main-color-dark: #4f518c;
     --main-color-darker: #2c2a4a;
+
+    --section1-color: #242423;
+    --section-1-text-color: white;
+
+    --section2-color: var(--main-color-light);
+    --section2-text-color: var(--main-color-darker);
+    
     --positive-outcome-color: #6ede8a;
     --negative-outcome-color: #e5383b;
 }
@@ -18,12 +25,12 @@ img {
 }
 
 h1 {
-    color: var(--main-color-darker);
+    color: var(--section1-color);
 }
 
 .main-section {
-    background-color: var(--main-color-darker);
-    color: white;
+    background-color: var(--section1-color);
+    color: var(--section-1-text-color);
     padding-bottom: 2em;
 }
 
@@ -48,7 +55,7 @@ h1 {
 
 .main-section h1 {
     text-align: center;
-    color: var(--main-color-lighter);
+    color: var(--section-1-text-color);
     padding: 0.8em 0em;
 }
 
@@ -63,15 +70,12 @@ h1 {
 
 
 .second-section {
-    background-color: var(--main-color-light);
-}
-
-.second-section h2 {
-    color: var(--main-color-darker);
+    background-color: var(--section2-color);
+    color: var(--section2-text-color)
 }
 
 .second-section .border {
-    border-color: var(--main-color-darker) !important;
+    border-color: var(--section2-text-color) !important;
     border-radius: 5px;
     padding: 5px;
 }
