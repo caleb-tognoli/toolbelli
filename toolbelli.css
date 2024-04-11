@@ -104,6 +104,10 @@ h1 {
 
 
 
+.card-body{
+    word-wrap: normal;
+    overflow: auto;
+}
 .card-title a {
     text-decoration: none;
     color: var(--main-color-dark);
