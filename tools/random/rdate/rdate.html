@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Random date - toolbelli</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+
+        <!-- Bootstrap CSS v5.2.1 -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="../../../toolbelli.css">
+        <script src="../../../toolbelli.js"></script>
+        <script>
+            var display_option_visible = false
+            var history_visible = false
+
+            const today = new Date()
+
+            const weekdays_en = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+            const months_en = ["January", "February", "March", "April", "May", "June", 
+                            "July", "August", "September", "October", "November", "December"]
+            
+            //format is a string composed as: x-...-c-yyy-l
+            //x is either w or n (word or numbers)
+            //... is a combination of characters. D, M, Y, / are replaced respectively by Day, Month, Year, separator
+            //yyy is either ext or abr (extended or abbreviated words)
+            //c is y or n, specifying the presence of the day's suffix (st/nd/rd/th)
+            //l is either 2 or 4, specifying the lenght of Year
+            function get_date_string_format(date, format, separator) {
+                format = format.split('-')
+
+                var weekday = date.getUTCDay()
+                var day = date.getUTCDate()
+                var month = date.getUTCMonth()+1
+                var year = date.getUTCFullYear()
+
+                if(format[4] == 2) year = Math.ceil((year/100 - Math.floor(year/100))*100)
+
+                if(format[0] == 'w') {
+                    weekday = weekdays_en[weekday]
+                    month = months_en[month-1]
+                    if(format[3] == 'abr') {
+                        weekday = weekday.substring(0,3)
+                        month = month.substring(0,3)
+                    }
+                    if(format[2] == 'y') 
+                        if(day == 1) day += "st"
+                        else if(day == 2) day += "nd"
+                        else if(day == 3) day += "rd"
+                        else day += "th"
+                } else {
+                    day = day.toString().padStart(2, '0')
+                    month = month.toString().padStart(2, '0')
+                }
+
+                var date_string = ''
+                for(let i = 0; i < format[1].length; i++) {
+                    let cur = format[1].charAt(i)
+                    if(cur == 'W') date_string += weekday
+                    else if(cur == 'D') date_string += day
+                    else if(cur == 'M') date_string += month
+                    else if(cur == 'Y') date_string += year
+                    else if(cur == '/' && format[0] == 'n') date_string += separator
+                    else date_string += cur
+                }
+                return date_string
+            }
+
+            function generate() {
+                var amount = document.getElementById("amount")
+                var output_section = document.getElementById("output")
+                
+                var min = document.getElementById('min')
+                var max = document.getElementById('max')
+
+                if(max.value < min.value) {
+                    let t = min.value
+                    min.value = max.value
+                    max.value = t
+                }
+
+                var min_date = Date.parse(min.value)
+                var max_date = Date.parse(max.value)
+
+
+                var output_stats = document.getElementById('output-stats')
+                output_stats.innerHTML = '<b>' + get_string_UTC_timestamp() + ' UTC</b> '
+                output_stats.innerHTML += 'Generated ' + amount.value + ' date'
+                if(amount.value > 1) output_stats.innerHTML += 's'
+                output_stats.innerHTML += ' from ' + get_string_UTC_date(new Date(min_date)) 
+                output_stats.innerHTML += ' to ' + get_string_UTC_date(new Date(max_date))
+
+                var abbr_m = document.getElementById('abbreviate-m').checked ? 'abr' : 'ext'
+                var abbr_y = document.getElementById('abbreviate-y').checked ? '2' : '4'
+                var selected_format = document.querySelector('input[name=\'date-format\']:checked').value + '-' + abbr_m + '-' + abbr_y
+
+                max_date = new Date(max_date).addDays(1).getTime() //Rende max inclusivo
+
+                var dates = []
+                for(i = 0; i < amount.value; i++) {
+                    var rdate = new Date(min_date + Math.random() * (max_date - min_date))
+                    dates.push(get_date_string_format(rdate, selected_format, document.getElementById('number-separator').value))
+                }
+
+                var separator = document.getElementById('separator').value + document.querySelector('input[name=\'separatorRadios\']:checked').value
+                var output_text = document.getElementById('output-text')
+                output_text.innerHTML = array_to_string(dates, separator)
+
+                var history = document.getElementById('history')
+                history.innerHTML = '<b>' + get_string_UTC_timestamp() + ' UTC</b><br>' + array_to_string(dates, ", ") + '<br>' + history.innerHTML
+            }
+        </script>
+    </head>
+
+    <body onload="
+        var min_date_input = document.getElementById('min')
+        min_date_input.value = get_string_UTC_date()
+        var max_date_input = document.getElementById('max')
+        max_date_input.value = today.getUTCFullYear() + '-12-31'
+
+        generate()
+        ">
+
+        <header class="sticky-top bg-white navbar navbar-expand-md navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../../../index.html">
+                    <img src="../../../logo.png" alt="logo" width="200px" class="user-select-none d-inline-block align-text-top m-2">
+                </a>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                        <a class="nav-link" href="../../../index.html">All tools</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="../../../about.html">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+
+        <main>
+            <div class="main-section">
+                <div class="container" style="max-width: 650px;">
+                    <h1>Random Date</h1>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="min"> Min </label>
+                                <input id="min" class="form-control" type="date" value=""> 
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="max"> Max </label>
+                                <input id="max" class="form-control" type="date" value=""> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <h5 class="mb-3">Format</h5>
+                        <div class="col ms-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="date-format" value="w-M D, Y-n" id="date-format0" checked>
+                                <label class="form-check-label" for="date-format0">
+                                    <script>
+                                        var cur_format = document.getElementById('date-format0').value
+                                        document.write(get_date_string_format(today, cur_format, ""))
+                                    </script>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="date-format" value="w-W, M D, Y-n" id="date-format1">
+                                <label class="form-check-label" for="date-format1">
+                                    <script>
+                                        var cur_format = document.getElementById('date-format1').value
+                                        document.write(get_date_string_format(today, cur_format, ""))
+                                    </script>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="date-format" value="w-D of M Y-y" id="date-format2">
+                                <label class="form-check-label" for="date-format2">
+                                    <script>
+                                        var cur_format = document.getElementById('date-format2').value
+                                        document.write(get_date_string_format(today, cur_format, ""))
+                                    </script>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="ms-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="date-format" value="n-Y/M/D-n" id="date-format3">
+                                    <label class="form-check-label" for="date-format3">
+                                        <script>
+                                            var cur_format = document.getElementById('date-format3').value
+                                            document.write(get_date_string_format(today, cur_format, " / "))
+                                        </script>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="date-format" value="n-D/M/Y-n" id="date-format4">
+                                    <label class="form-check-label" for="date-format4">
+                                        <script>
+                                            var cur_format = document.getElementById('date-format4').value
+                                            document.write(get_date_string_format(today, cur_format, " / "))
+                                        </script>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="date-format" value="n-M/D/Y-n" id="date-format5">
+                                    <label class="form-check-label" for="date-format5">
+                                        <script>
+                                            var cur_format = document.getElementById('date-format5').value
+                                            document.write(get_date_string_format(today, cur_format, " / "))
+                                        </script>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="amount"> Amount to generate </label>
+                        <input id="amount" class="form-control" type="number" min="1" value="1"> 
+                    </div>
+                    <div class="small my-3">
+                        <button class="option-button bi-caret-down-fill mb-2" 
+                        onclick="
+                            display_option_visible = !display_option_visible
+                            document.getElementById('advanced-options').style = display_option_visible ? 'display: block-inline' : 'display: none'
+                        "> 
+                            Display options
+                        </button>
+                        
+                        <div id="advanced-options" style="display: none;">
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="number-separator"> Number separator </label>
+                                        <div class="input-group">
+                                            <input id="number-separator" class="form-control" type="text" value="/" maxlength="10"> 
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary bi bi-arrow-counterclockwise px-3" type="button" title="Reset"
+                                                onclick="document.getElementById('number-separator').value='/'"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col mt-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="abbreviate-m">
+                                        <label class="form-check-label" for="abbreviate-m">Abbreviate month and weekday</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="abbreviate-y">
+                                        <label class="form-check-label" for="abbreviate-y">Abbreviate year</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="separator"> Dates separator </label>
+                                        <div class="input-group">
+                                            <input id="separator" class="form-control" type="text" value="" maxlength="10"> 
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary bi bi-arrow-counterclockwise px-3" type="button" title="Reset"
+                                                onclick="document.getElementById('separator').value=''"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-check"> 
+                                        <input class="form-check-input" name="separatorRadios" type="radio" value=" " id=""/>
+                                        <label class="form-check-label" for=""> Space </label>
+                                    </div>
+                                    <div class="form-check"> 
+                                        <input class="form-check-input" name="separatorRadios" type="radio" value="<br>" id="" checked/>
+                                        <label class="form-check-label" for=""> New line </label>
+                                    </div>
+                                    <div class="form-check"> 
+                                        <input class="form-check-input" name="separatorRadios" type="radio" value="" id="" />
+                                        <label class="form-check-label" for=""> None </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width: 100%;" onclick="generate()">
+                        Generate
+                    </button>
+                </div>
+            </div>
+
+            <div class="container-fluid" >
+                <div class="row">
+                    <div class="col p-0">
+                        <div id="output" class="col p-0 output-section overflow-auto positive">
+                            <div class="m-auto px-3" style="max-width: 1000px;">
+                                <div class="row justify-content-between align-self-center">
+                                    <div id="output-stats" class="col-auto small text-center py-3"></div>
+                                    <div class="col-auto">
+                                        <button 
+                                            id="copy-to-clipboard"
+                                            title="Copy to clipboard"
+                                            class="align-self-end bi bi-clipboard pb-2 btn" 
+                                            style="font-size: 1.5em;" 
+                                            onclick="
+                                                navigator.clipboard.writeText(document.getElementById('output-text').innerHTML)
+                                            ">
+                                        </button>
+                                        <button 
+                                            id="history-button"
+                                            title="Toggle history"
+                                            class="align-self-end bi bi-clock pb-2 btn" 
+                                            style="font-size: 1.5em;" 
+                                            onclick="
+                                                history_visible = !history_visible
+                                                var history = document.getElementById('history-section')
+                                                
+                                                if(history_visible) {
+                                                    history.classList.remove('d-none')
+                                                    history.classList.add('d-block')
+                                                } else {
+                                                    history.classList.remove('d-block')
+                                                    history.classList.add('d-none')
+                                                }
+                                            ">
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="output-text" class="display-5 pb-4" style="overflow: auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="history-section" class="col-4 py-4 px-4 d-none second-section">
+                        <h2>History</h2>
+                        <div class="py-3">
+                            <div id="history" class="border" style="overflow: auto; max-height: 600px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+        <footer>
+            <!-- place footer here -->
+        </footer>
+        <!-- Bootstrap JavaScript Libraries -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"
+        ></script>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>
