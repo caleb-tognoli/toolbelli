@@ -28,6 +28,10 @@ h1 {
     color: var(--section1-color);
 }
 
+.navbar {
+    padding-left: 5%;
+}
+
 .main-section {
     background-color: var(--section1-color);
     color: var(--section-1-text-color);
